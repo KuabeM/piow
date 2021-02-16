@@ -1,0 +1,20 @@
+
+# Fallback icon
+default_icon = "•"
+
+# TODO: use formatting string with placeholders like %n %i
+# Separator between workspace number and icon
+icon_separator = "  "
+
+[icons]
+"firefox" = ""
+"chrome" = ""
+"alacritty" = ""
+"emacs" = ""
+"thunar" = ""
+"code" = ""
+"spotify" = ""
+"tm" = ""
+"pm" = ""
+"evince" = ""
+"signal" = ""
