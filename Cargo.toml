@@ -3,22 +3,32 @@ name = "piow"
 version = "0.1.0"
 authors = ["Korbinian Maier <korbinian.maier@posteo.de>"]
 edition = "2018"
+description = "Put Icons On your sway Workspaces"
+homepage = ""
+keywords = ["sway", "wayland", "workspaces"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = ""
+
+[badges]
+maintenance = { status = "actively-maintained" }
 
 [dependencies]
-# swayipc = "2.7"
-swayipc-async = "2.0.0-alpha.2"
-
-tokio = { version = "0.3.2", features = ["rt-multi-thread", "macros"] }
+# Async connection to sway
 futures-util = "0.3.7"
-
-toml = {"version" = "0.5.3"} #, "features" = ["preserve_order"]}
-
+swayipc-async = "2.0.0-alpha.2"
+tokio = { version = "0.3.2", features = ["rt-multi-thread", "macros"] }
+# Config
+dirs = "3.0"
 indexmap = {"version" = "1", "features" = ["serde"]}
 serde = "1"
 serde_derive = "*"
-failure = "0.1"
-dirs = "3.0"
-
+toml = {"version" = "0.5.3"}
+# Utils
 docopt = "1"
-log = "0.4"
 env_logger = "0.8"
+failure = "0.1"
+log = "0.4"
+
+[profile.release]
+lto = true

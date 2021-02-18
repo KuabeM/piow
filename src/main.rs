@@ -60,30 +60,29 @@ async fn main() -> Result<(), Error> {
             Event::Workspace(ev) => ev.current.unwrap(),
             _ => unreachable!("Unsubscribed events unreachable"),
         };
-
-        // Get icons to place on current workspace
-        let ids = nodes::AppIds::from(&curr_ws).map(&cfg).join(" ");
         let ws_name = match curr_ws.name {
-            Some(n) => n,
+            Some(ref n) => n,
             None => continue,
         };
         let ws_num = match curr_ws.num {
-            Some(s) => s,
+            Some(ref s) => s,
             None => continue,
         };
+
+        // Get icons to place on current workspace
+        let icons = nodes::AppIds::from(&curr_ws).map(&cfg).join(" ");
+        let format = cfg.format(ws_num.to_string(), icons);
 
         let cmd = "rename workspace '".to_string()
             + &ws_name
             + "' to '"
-            + &ws_num.to_string()
-            + &cfg.icon_separator
-            + &ids.to_string()
+            + &format
             + "'";
         log::trace!("Cmd: >{}<", cmd);
         let mut connection2 = Connection::new().await?;
         for outcome in connection2.run_command(&cmd).await? {
             if let Err(error) = outcome {
-                log::error!("Failed to rename workspace: '{}'", error);
+                log::error!("Failed to rename workspace '{}': '{}'", ws_name, error);
             }
         }
     }

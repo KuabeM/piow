@@ -1,3 +1,5 @@
+//! Extract application ids from sway workspace tree.
+
 use log::{debug, trace, warn};
 use swayipc_async::Node;
 
