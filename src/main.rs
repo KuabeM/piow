@@ -4,7 +4,7 @@ use failure::Error;
 use futures_util::stream::StreamExt;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
-use swayipc_async::{Connection, WorkspaceChange, Event, EventType};
+use swayipc_async::{Connection, Event, EventType, WorkspaceChange};
 
 mod config;
 mod nodes;
