@@ -1,6 +1,6 @@
-///! Configuration file for piow.
-///!
-///! Parsing the toml file format into a `Config` struct.
+//! Configuration handling for piow.
+//!
+//! Parsing the toml file format into a `Config` struct.
 use failure::{format_err, Error};
 use indexmap::IndexMap;
 use log::{debug, trace};

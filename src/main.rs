@@ -1,3 +1,5 @@
+//! Rename workspaces of your sway window manager by dynamically adding icons of applications in each workspace.
+//! Configuration is done in toml file at `${XDG_CONFIG_HOME}/piow/config.toml`.
 use failure::Error;
 use futures_util::stream::StreamExt;
 use serde_derive::Deserialize;
@@ -22,6 +24,7 @@ Options:
   --config=<cfg>       Path to config file. Defaults to $XDG_CONFIG_HOME or $HOME/.config.
 "#;
 
+/// Docopt argument struct.
 #[derive(Debug, Deserialize, Default)]
 struct Args {
     flag_config: Option<PathBuf>,

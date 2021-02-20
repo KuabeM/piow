@@ -1,10 +1,10 @@
-//! Extract application ids from sway workspace tree.
-
+//! Extract application ids from sway workspace tree and map them to workspace names.
 use log::{debug, trace, warn};
 use swayipc_async::Node;
 
 use crate::config::Config;
 
+/// Strip a slice of patterns from a string.
 fn strip(input: &str, patterns: &[&str]) -> String {
     let mut work = input.to_string();
     for p in patterns.iter() {
@@ -14,6 +14,7 @@ fn strip(input: &str, patterns: &[&str]) -> String {
     work
 }
 
+/// Collection of App Ids scraped from sway workspace tree.
 #[derive(Debug)]
 pub struct AppIds {
     inner: Vec<String>,
@@ -52,6 +53,9 @@ impl From<&Node> for AppIds {
 }
 
 impl AppIds {
+    /// Map collected App Ids to a new workspace name based on the config.
+    ///
+    /// Resulting string is the new workspace name consisting of workspace number, separator and icons.
     pub fn map(&self, cfg: &Config) -> String {
         let mut icons: Vec<String> = self
             .inner
@@ -74,6 +78,9 @@ impl AppIds {
     }
 }
 
+/// Construct the sway command for renaming `workspace`.
+///
+/// Returns a tuple of workspace name and command for renaming.
 pub fn contruct_rename_cmd(workspace: &Node, cfg: &Config) -> Option<(String, String)> {
     let ws_name = match workspace.name {
         Some(ref n) => n,
