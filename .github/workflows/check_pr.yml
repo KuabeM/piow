@@ -1,0 +1,21 @@
+name: check-pr
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build --verbose --release
+    - name: Run tests
+      run: cargo test --verbose
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check format
+      run: cargo fmt -- --check
+    - name: Check clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings

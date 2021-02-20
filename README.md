@@ -1,6 +1,6 @@
 # Put Icons On Workspaces
 
-Rename sway workspaces with icons according to the applications running on them. It constructs the
+Rename [sway] workspaces with icons according to the applications running on them. It constructs the
 name based on a format string from the config. Duplicate icons are stripped from the list.
 
 With a space as separator and waybar, it looks like this:
@@ -68,5 +68,6 @@ sway/workspaces {
 [Workstyle] has a similar approach but uses the i3 IPC connection. The config file format was
 inspired by this crate.
 
+[sway]: https://github.com/swaywm/sway
 [find_unicode]: https://crates.io/crates/find_unicode
 [Workstyle]: https://github.com/pierrechevalier83/workstyle
