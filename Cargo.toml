@@ -10,9 +10,6 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/KuabeM/piow.git"
 
-[badges]
-maintenance = { status = "actively-maintained" }
-
 [dependencies]
 # Async connection to sway
 futures-util = "0.3.7"

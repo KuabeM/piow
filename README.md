@@ -1,5 +1,8 @@
 # Put Icons On Workspaces
 
+[![Build](https://img.shields.io/github/workflow/status/KuabeM/piow/build-master)](https://github.com/KuabeM/piow/actions?query=workflow%3Abuild-master)
+[![Crates.io](https://img.shields.io/crates/v/piow.svg)](https://crates.io/crates/piow)
+
 Rename [sway] workspaces with icons according to the applications running on them. It constructs the
 name based on a format string from the config. Duplicate icons are stripped from the list.
 
