@@ -1,7 +1,6 @@
 ///! Configuration file for piow.
 ///!
 ///! Parsing the toml file format into a `Config` struct.
-
 use failure::{format_err, Error};
 use indexmap::IndexMap;
 use log::{debug, trace};
@@ -9,9 +8,9 @@ use serde_derive::Deserialize;
 use std::{io::Read, path::PathBuf};
 
 /// Placeholder for workspace number.
-const NUM: &'static str = "%n";
+const NUM: &str = "%n";
 /// Placeholder for Icon.
-const ICON: &'static str = "%i";
+const ICON: &str = "%i";
 
 /// Configuration for icon to workspace mappings.
 #[derive(Debug, Deserialize)]
@@ -19,7 +18,9 @@ pub struct Config {
     /// Literal/Icon used for applications not in the map.
     pub default_icon: String,
     /// Formatting string of the new name. Supports `%n` and `%i` placeholders for workspace number and icon, respectively.
-    pub format_str: String,
+    format_str: String,
+    /// Literal for separating icons.
+    pub icon_separator: String,
     /// Application name to icon literal name.
     pub icons: IndexMap<String, String>,
 }

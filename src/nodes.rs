@@ -5,8 +5,8 @@ use swayipc_async::Node;
 
 use crate::config::Config;
 
-fn strip(input: &String, patterns: &[&str]) -> String {
-    let mut work = input.clone();
+fn strip(input: &str, patterns: &[&str]) -> String {
+    let mut work = input.to_string();
     for p in patterns.iter() {
         trace!("replace >{}< in >{}<", p, work);
         work = work.replace(p, "");
@@ -25,13 +25,13 @@ impl From<&Node> for AppIds {
             .nodes
             .iter()
             .filter_map(|n| n.app_id.as_ref())
-            .map(|id| id.clone())
+            .cloned()
             .collect();
         let mut floating: Vec<String> = workspace
             .floating_nodes
             .iter()
             .filter_map(|n| n.app_id.as_ref())
-            .map(|id| id.clone())
+            .cloned()
             .collect();
         ids.append(&mut floating);
         if let Some(reps) = workspace.representation.as_ref() {
@@ -52,7 +52,7 @@ impl From<&Node> for AppIds {
 }
 
 impl AppIds {
-    pub fn map<'a>(&self, cfg: &Config) -> Vec<String> {
+    pub fn map(&self, cfg: &Config) -> String {
         let mut icons: Vec<String> = self
             .inner
             .iter()
@@ -65,11 +65,30 @@ impl AppIds {
                     Some(&cfg.default_icon)
                 }
             })
-            .map(|e| e.clone())
+            .cloned()
             .collect();
         icons.sort();
         icons.dedup();
         debug!("Found icons '{:?}' for ids '{:?}'", icons, self.inner);
-        icons
+        icons.join(&cfg.icon_separator)
     }
+}
+
+pub fn contruct_rename_cmd(workspace: &Node, cfg: &Config) -> Option<(String, String)> {
+    let ws_name = match workspace.name {
+        Some(ref n) => n,
+        None => return None,
+    };
+    let ws_num = match workspace.num {
+        Some(ref s) => s,
+        None => return None,
+    };
+
+    // Get icons to place on current workspace
+    let icons = AppIds::from(workspace).map(&cfg);
+    let format = cfg.format(ws_num.to_string(), icons);
+
+    let cmd = "rename workspace '".to_string() + &ws_name + "' to '" + &format + "'";
+    log::trace!("Cmd: >{}<", cmd);
+    Some((ws_name.to_string(), cmd))
 }

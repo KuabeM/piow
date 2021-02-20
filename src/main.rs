@@ -1,8 +1,8 @@
 use failure::Error;
 use futures_util::stream::StreamExt;
+use serde_derive::Deserialize;
 use std::path::PathBuf;
 use swayipc_async::{Connection, Event, EventType};
-use serde_derive::Deserialize;
 
 mod config;
 mod nodes;
@@ -54,35 +54,36 @@ async fn main() -> Result<(), Error> {
     let subs = [EventType::Workspace];
     let connection = Connection::new().await?;
     let mut events = connection.subscribe(&subs).await?;
+    // Get connections for sending commands
+    let mut cmd_curr_con = Connection::new().await?;
+    let mut cmd_old_con = Connection::new().await?;
 
     while let Some(event) = events.next().await {
         let curr_ws = match event? {
             Event::Workspace(ev) => ev.current.unwrap(),
             _ => unreachable!("Unsubscribed events unreachable"),
         };
-        let ws_name = match curr_ws.name {
-            Some(ref n) => n,
+        // Get new name for current workspace (The one we landed on).
+        let (name_curr, cmd_curr) = match nodes::contruct_rename_cmd(&curr_ws, &cfg) {
+            Some(cmd) => cmd,
             None => continue,
         };
-        let ws_num = match curr_ws.num {
-            Some(ref s) => s,
+        // Get new name for the old workspace (The one we started on).
+        let (name_old, cmd_old) = match nodes::contruct_rename_cmd(&curr_ws, &cfg) {
+            Some(cmd) => cmd,
             None => continue,
         };
-
-        // Get icons to place on current workspace
-        let icons = nodes::AppIds::from(&curr_ws).map(&cfg).join(" ");
-        let format = cfg.format(ws_num.to_string(), icons);
-
-        let cmd = "rename workspace '".to_string()
-            + &ws_name
-            + "' to '"
-            + &format
-            + "'";
-        log::trace!("Cmd: >{}<", cmd);
-        let mut connection2 = Connection::new().await?;
-        for outcome in connection2.run_command(&cmd).await? {
+        // Run the commands
+        let cmd_curr_res = cmd_curr_con.run_command(&cmd_curr);
+        let cmd_old_res = cmd_old_con.run_command(&cmd_old);
+        for outcome in cmd_curr_res.await? {
             if let Err(error) = outcome {
-                log::error!("Failed to rename workspace '{}': '{}'", ws_name, error);
+                log::error!("Failed to rename workspace '{}': '{}'", name_curr, error);
+            }
+        }
+        for outcome in cmd_old_res.await? {
+            if let Err(error) = outcome {
+                log::error!("Failed to rename workspace '{}': '{}'", name_old, error);
             }
         }
     }
