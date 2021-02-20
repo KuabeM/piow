@@ -4,7 +4,7 @@ use failure::Error;
 use futures_util::stream::StreamExt;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
-use swayipc_async::{Connection, Event, EventType};
+use swayipc_async::{Connection, WorkspaceChange, Event, EventType};
 
 mod config;
 mod nodes;
@@ -63,8 +63,15 @@ async fn main() -> Result<(), Error> {
 
     while let Some(event) = events.next().await {
         let curr_ws = match event? {
-            Event::Workspace(ev) => ev.current.unwrap(),
-            _ => unreachable!("Unsubscribed events unreachable"),
+            Event::Workspace(ev) => {
+                if ev.change != WorkspaceChange::Focus {
+                    log::trace!("Event '{:?}' not processed.", ev.change);
+                    continue;
+                }
+                log::trace!("New event: '{:?}'", ev.change);
+                ev.current.unwrap()
+            }
+            _ => unreachable!("Unsubscribed events unreachable."),
         };
         // Get new name for current workspace (The one we landed on).
         let (name_curr, cmd_curr) = match nodes::contruct_rename_cmd(&curr_ws, &cfg) {

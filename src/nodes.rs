@@ -36,11 +36,12 @@ impl From<&Node> for AppIds {
             .collect();
         ids.append(&mut floating);
         if let Some(reps) = workspace.representation.as_ref() {
+            trace!("Representation: {:?}", reps);
             let mut id: Vec<String> = strip(reps, &["H[", "V[", "[", "]", "\""])
                 .split(' ')
                 .map(|i| i.to_string())
                 .collect();
-            debug!("Found no app ids, but ids in the representation {:?}", id);
+            debug!("Found additional app ids in the representation {:?}", id);
             ids.append(&mut id);
         }
         debug!(
@@ -61,8 +62,8 @@ impl AppIds {
             .inner
             .iter()
             .filter_map(|id| {
-                trace!("Looking for id '{}'", &id);
                 if let Some(ics) = cfg.icons.keys().find(|e| e.contains(&id.to_lowercase())) {
+                    trace!("Found icon {:?} for id '{}'", cfg.icons.get(ics), &id);
                     cfg.icons.get(ics)
                 } else {
                     warn!("No icon for application '{}' in the config.", id);

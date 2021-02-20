@@ -32,12 +32,12 @@ contains a map of application names to icons, a default icon and a separator bet
 number and icons. For getting started, just copy `default.toml` over to
 `${XDG_CONFIG_HOME}/piow/config.toml` and start adding your own icons.
 
-| Configuration Key | Description                                                                                                |
-|-------------------|------------------------------------------------------------------------------------------------------------|
-| default_icon      | Icon used for apps without a configured icon                                                               |
-| format_str        | Format string for generating names. Supported placeholders:<br/>  `%n`: Workspace number<br/>  `%i`: Icons |
-| icon_separator    | Literal between icons                                                                                      |
-| [icons]           | (app id, icon) map, app id as reported by `swaymsg -t get_tree`                                            |
+| Configuration Key | Description                                                                                                                                            |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `default_icon`    | Icon used for apps without a configured icon                                                                                                           |
+| `format_str`      | Format string for generating names. Supported placeholders:<br/>  `%n`: Workspace number<br/>  `%i`: Icons                                             |
+| `icon_separator`  | Literal between icons                                                                                                                                  |
+| `[icons]`         | paris of `"app-id" = "icon"`, app id as reported by `swaymsg -t get_tree`, matches substrings, e.g. an entry 'libre' will be matched for 'libreoffice' |
 
 Watch the log for messages like `[WARN piow::nodes] No icon for application 'app-name' in the
 config.` to find applications without a config entry. Just add a line `"app-name" = "icon"` to the
