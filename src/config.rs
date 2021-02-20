@@ -17,7 +17,8 @@ const ICON: &str = "%i";
 pub struct Config {
     /// Literal/Icon used for applications not in the map.
     pub default_icon: String,
-    /// Formatting string of the new name. Supports `%n` and `%i` placeholders for workspace number and icon, respectively.
+    /// Formatting string of the new name. Supports `%n` and `%i` placeholders for workspace number
+    /// and icon, respectively.
     format_str: String,
     /// Literal for separating icons.
     pub icon_separator: String,
@@ -34,9 +35,10 @@ impl Default for Config {
 }
 
 impl Config {
-    /// Load the configuration file from either `path` or the default config dir `${XDG_CONFIG_HOME}`.
+    /// Load the configuration file from either `path` or the default config dir
+    /// `${XDG_CONFIG_HOME}`.
     ///
-    /// Error: File does not exist or can't be openend, syntax errors and other parsing errors.
+    /// Error: File does not exist or can't be opened, syntax errors and other parsing errors.
     pub fn load(path: Option<PathBuf>) -> Result<Self, Error> {
         let cfg_path: PathBuf = if let Some(p) = path {
             p
@@ -53,7 +55,8 @@ impl Config {
         toml::from_str(&content).map_err(|e| format_err!("Failed to parse config: {}", e))
     }
 
-    /// Generate the workspace name from the format string in the config by replacing all placeholders with their desired values.
+    /// Generate the workspace name from the format string in the config by replacing all
+    /// placeholders with their desired values.
     ///
     /// Currently supported placeholders:
     ///

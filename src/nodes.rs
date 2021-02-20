@@ -56,7 +56,8 @@ impl From<&Node> for AppIds {
 impl AppIds {
     /// Map collected App Ids to a new workspace name based on the config.
     ///
-    /// Resulting string is the new workspace name consisting of workspace number, separator and icons.
+    /// Resulting string is the new workspace name consisting of workspace number, separator and
+    /// icons.
     pub fn map(&self, cfg: &Config) -> String {
         let mut icons: Vec<String> = self
             .inner
