@@ -22,7 +22,7 @@ tokio = { version = "0.3.2", features = ["rt-multi-thread", "macros"] }
 dirs = "3.0"
 indexmap = {"version" = "1", "features" = ["serde"]}
 serde = "1"
-serde_derive = "*"
+serde_derive = "1"
 toml = {"version" = "0.5.3"}
 # Utils
 docopt = "1"
