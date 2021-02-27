@@ -74,12 +74,12 @@ async fn main() -> Result<(), Error> {
             _ => unreachable!("Unsubscribed events unreachable."),
         };
         // Get new name for current workspace (The one we landed on).
-        let (name_curr, cmd_curr) = match nodes::contruct_rename_cmd(&curr_ws, &cfg) {
+        let (name_curr, cmd_curr) = match nodes::construct_rename_cmd(&curr_ws, &cfg) {
             Some(cmd) => cmd,
             None => continue,
         };
         // Get new name for the old workspace (The one we started on).
-        let (name_old, cmd_old) = match nodes::contruct_rename_cmd(&curr_ws, &cfg) {
+        let (name_old, cmd_old) = match nodes::construct_rename_cmd(&curr_ws, &cfg) {
             Some(cmd) => cmd,
             None => continue,
         };

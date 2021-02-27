@@ -83,7 +83,7 @@ impl AppIds {
 /// Construct the sway command for renaming `workspace`.
 ///
 /// Returns a tuple of workspace name and command for renaming.
-pub fn contruct_rename_cmd(workspace: &Node, cfg: &Config) -> Option<(String, String)> {
+pub fn construct_rename_cmd(workspace: &Node, cfg: &Config) -> Option<(String, String)> {
     let ws_name = match workspace.name {
         Some(ref n) => n,
         None => return None,
