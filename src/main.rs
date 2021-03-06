@@ -1,6 +1,6 @@
 //! Rename workspaces of your sway window manager by dynamically adding icons of applications in
 //! each workspace. Configuration is done in toml file at `${XDG_CONFIG_HOME}/piow/config.toml`.
-use failure::Error;
+use failure::{format_err, Error};
 use futures_util::stream::StreamExt;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
@@ -14,7 +14,7 @@ const USAGE: &str = r#"
 Put icons of apps on sway workspaces.
 
 Usage:
-    piow [--config=<cfg>]
+    piow [--config=<cfg>] [--syslog]
     piow (-h|--help)
     piow (-v|--version)
 
@@ -22,12 +22,14 @@ Options:
   -h --help            Show this screen.
   --version            Print the version and exit.
   --config=<cfg>       Path to config file. Defaults to $XDG_CONFIG_HOME or $HOME/.config.
+  --syslog             Send log messages to syslog instead of stdout.
 "#;
 
 /// Docopt argument struct.
 #[derive(Debug, Deserialize, Default)]
 struct Args {
     flag_config: Option<PathBuf>,
+    flag_syslog: bool,
     flag_version: bool,
     flag_help: bool,
 }
@@ -38,9 +40,18 @@ async fn main() -> Result<(), Error> {
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn"))
-        .format_timestamp(None)
-        .init();
+    if args.flag_syslog {
+        syslog::init(
+            syslog::Facility::LOG_USER,
+            log::LevelFilter::Warn,
+            Some(env!("CARGO_PKG_NAME")),
+        )
+        .map_err(|e| format_err!("{}", e))?;
+    } else {
+        env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn"))
+            .format_timestamp(None)
+            .init();
+    }
 
     if args.flag_help {
         println!("{}", USAGE);
@@ -88,12 +99,12 @@ async fn main() -> Result<(), Error> {
         let cmd_old_res = cmd_old_con.run_command(&cmd_old);
         for outcome in cmd_curr_res.await? {
             if let Err(error) = outcome {
-                log::error!("Failed to rename workspace '{}': '{}'", name_curr, error);
+                log::debug!("Failed to rename workspace '{}': '{}'", name_curr, error);
             }
         }
         for outcome in cmd_old_res.await? {
             if let Err(error) = outcome {
-                log::error!("Failed to rename workspace '{}': '{}'", name_old, error);
+                log::debug!("Failed to rename workspace '{}': '{}'", name_old, error);
             }
         }
     }

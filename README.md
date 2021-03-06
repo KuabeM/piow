@@ -46,11 +46,11 @@ icons on the command line.
 
 ## Setup with sway & waybar
 
-Add the following to your sway config file at `${XDG_CONFIG_HOME}/sway/config`. By fowarding the
+Add the following to your sway config file at `${XDG_CONFIG_HOME}/sway/config`. By forwarding the
 log you get access to application names without a icon in the config.
 
 ```bash
-exec_always --no-startup-id piow > /tmp/piow.log
+exec_always --no-startup-id piow --syslog
 ```
 
 It's useful to turn of additional renaming in waybar, e.g. remove `"format"` and `"format-icon"`
