@@ -4,14 +4,25 @@ use swayipc_async::Node;
 
 use crate::config::Config;
 
-/// Strip a slice of patterns from a string.
-fn strip(input: &str, patterns: &[&str]) -> String {
-    let mut work = input.to_string();
-    for p in patterns.iter() {
-        trace!("replace >{}< in >{}<", p, work);
-        work = work.replace(p, "");
-    }
-    work
+fn filter_nodes(node: &Node) -> Vec<String> {
+    let ids = node
+        .nodes
+        .iter()
+        .map(|n| {
+            let mut ids = filter_nodes(n);
+            if let Some(props) = n.window_properties.as_ref() {
+                if let Some(class) = props.class.as_ref() {
+                    ids.push(class.to_string());
+                }
+            }
+            if let Some(id) = n.app_id.as_ref() {
+                ids.push(id.to_string());
+            }
+            ids
+        })
+        .flatten()
+        .collect();
+    ids
 }
 
 /// Collection of App Ids scraped from sway workspace tree.
@@ -22,28 +33,18 @@ pub struct AppIds {
 
 impl From<&Node> for AppIds {
     fn from(workspace: &Node) -> Self {
-        let mut ids: Vec<String> = workspace
-            .nodes
-            .iter()
-            .filter_map(|n| n.app_id.as_ref())
-            .cloned()
-            .collect();
-        let mut floating: Vec<String> = workspace
+        let mut ids = filter_nodes(workspace);
+        trace!("App ids: {:?}", ids);
+
+        let mut floating = workspace
             .floating_nodes
             .iter()
-            .filter_map(|n| n.app_id.as_ref())
-            .cloned()
+            .map(|n| filter_nodes(n))
+            .flatten()
             .collect();
+        trace!("Floating app ids {:?}", floating);
         ids.append(&mut floating);
-        if let Some(reps) = workspace.representation.as_ref() {
-            trace!("Representation: {:?}", reps);
-            let mut id: Vec<String> = strip(reps, &["H[", "V[", "[", "]", "\""])
-                .split(' ')
-                .map(|i| i.to_string())
-                .collect();
-            debug!("Found additional app ids in the representation {:?}", id);
-            ids.append(&mut id);
-        }
+
         debug!(
             "Found app ids '{:?}' on workspace '{}'",
             ids,
@@ -63,7 +64,11 @@ impl AppIds {
             .inner
             .iter()
             .filter_map(|id| {
-                if let Some(ics) = cfg.icons.keys().find(|e| e.contains(&id.to_lowercase())) {
+                if let Some(ics) = cfg
+                    .icons
+                    .keys()
+                    .find(|e| id.to_lowercase().contains(&e.to_string()))
+                {
                     trace!("Found icon {:?} for id '{}'", cfg.icons.get(ics), &id);
                     cfg.icons.get(ics)
                 } else {
