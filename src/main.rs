@@ -68,9 +68,8 @@ async fn main() -> Result<(), Error> {
     let subs = [EventType::Workspace];
     let connection = Connection::new().await?;
     let mut events = connection.subscribe(&subs).await?;
-    // Get connections for sending commands
-    let mut cmd_curr_con = Connection::new().await?;
-    let mut cmd_old_con = Connection::new().await?;
+    // Get connection for sending commands
+    let mut cmd_con = Connection::new().await?;
 
     while let Some(event) = events.next().await {
         let curr_ws = match event? {
@@ -89,22 +88,11 @@ async fn main() -> Result<(), Error> {
             Some(cmd) => cmd,
             None => continue,
         };
-        // Get new name for the old workspace (The one we started on).
-        let (name_old, cmd_old) = match nodes::construct_rename_cmd(&curr_ws, &cfg) {
-            Some(cmd) => cmd,
-            None => continue,
-        };
-        // Run the commands
-        let cmd_curr_res = cmd_curr_con.run_command(&cmd_curr);
-        let cmd_old_res = cmd_old_con.run_command(&cmd_old);
-        for outcome in cmd_curr_res.await? {
+        // Run the command
+        let cmd_res = cmd_con.run_command(&cmd_curr);
+        for outcome in cmd_res.await? {
             if let Err(error) = outcome {
                 log::debug!("Failed to rename workspace '{}': '{}'", name_curr, error);
-            }
-        }
-        for outcome in cmd_old_res.await? {
-            if let Err(error) = outcome {
-                log::debug!("Failed to rename workspace '{}': '{}'", name_old, error);
             }
         }
     }
