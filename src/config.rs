@@ -3,7 +3,7 @@
 //! Parsing the toml file format into a `Config` struct.
 use failure::{format_err, Error};
 use indexmap::IndexMap;
-use log::{debug, trace};
+use log::{debug, warn};
 use serde_derive::Deserialize;
 use std::{io::Read, path::PathBuf};
 
@@ -28,7 +28,7 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
-        trace!("Using default config.");
+        warn!("Using default config.");
         let content = std::include_str!("../default.toml");
         toml::from_str(&content).expect("Parsing default works.")
     }

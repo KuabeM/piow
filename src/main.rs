@@ -2,6 +2,7 @@
 //! each workspace. Configuration is done in toml file at `${XDG_CONFIG_HOME}/piow/config.toml`.
 use failure::{format_err, Error};
 use futures_util::stream::StreamExt;
+use log::error;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
 use swayipc_async::{Connection, Event, EventType, WorkspaceChange};
@@ -62,7 +63,9 @@ async fn main() -> Result<(), Error> {
     }
 
     // Load config: app_id to icon mapping
-    let cfg = config::Config::load(args.flag_config).unwrap_or_default();
+    let cfg = config::Config::load(args.flag_config)
+        .map_err(|e| error!("{}", e))
+        .unwrap_or_default();
 
     // Subscribe to sway events, only Workspace event is interesting
     let subs = [EventType::Workspace];
