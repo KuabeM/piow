@@ -30,7 +30,7 @@ impl Default for Config {
     fn default() -> Self {
         warn!("Using default config.");
         let content = std::include_str!("../default.toml");
-        toml::from_str(&content).expect("Parsing default works.")
+        toml::from_str(content).expect("Parsing default works.")
     }
 }
 

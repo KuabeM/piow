@@ -99,10 +99,10 @@ pub fn construct_rename_cmd(workspace: &Node, cfg: &Config) -> Option<(String, S
     };
 
     // Get icons to place on current workspace
-    let icons = AppIds::from(workspace).map(&cfg);
+    let icons = AppIds::from(workspace).map(cfg);
     let format = cfg.format(ws_num.to_string(), icons);
 
-    let cmd = "rename workspace '".to_string() + &ws_name + "' to '" + &format + "'";
+    let cmd = "rename workspace '".to_string() + ws_name + "' to '" + &format + "'";
     log::trace!("Cmd: >{}<", cmd);
     Some((ws_name.to_string(), cmd))
 }
