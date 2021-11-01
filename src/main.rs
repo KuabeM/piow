@@ -35,6 +35,15 @@ struct Args {
     flag_help: bool,
 }
 
+macro_rules! skip_none {
+    ($f:expr) => {
+        match $f {
+            Some(s) => s,
+            None => continue,
+        }
+    };
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args: Args = docopt::Docopt::new(USAGE)
@@ -75,29 +84,33 @@ async fn main() -> Result<(), Error> {
     let mut cmd_con = Connection::new().await?;
 
     while let Some(event) = events.next().await {
-        let curr_ws = match event? {
+        match event? {
             Event::Workspace(ev) => {
                 if ev.change != WorkspaceChange::Focus {
-                    log::trace!("Event '{:?}' not processed.", ev.change);
+                    log::trace!("Workspace Event '{:?}' not processed.", ev.change);
                     continue;
                 }
-                log::trace!("New event: '{:?}'", ev.change);
-                ev.current.unwrap()
+                log::trace!("New workspace event: '{:?}'", ev.change);
+                // Get new name for current workspace (The one we landed on).
+                let (name_curr, cmd_curr) =
+                    skip_none!(nodes::construct_rename_cmd(&ev.current.unwrap(), &cfg));
+                // Get new name for old workspace (The one we came from).
+                let (name_old, cmd_old) =
+                    skip_none!(nodes::construct_rename_cmd(&ev.old.unwrap(), &cfg));
+                // Run the commands
+                for outcome in cmd_con.run_command(&cmd_curr).await? {
+                    if let Err(error) = outcome {
+                        log::debug!("Failed to rename workspace '{}': '{}'", name_curr, error);
+                    }
+                }
+                for outcome in cmd_con.run_command(&cmd_old).await? {
+                    if let Err(error) = outcome {
+                        log::debug!("Failed to rename workspace '{}': '{}'", name_old, error);
+                    }
+                }
             }
             _ => unreachable!("Unsubscribed events unreachable."),
         };
-        // Get new name for current workspace (The one we landed on).
-        let (name_curr, cmd_curr) = match nodes::construct_rename_cmd(&curr_ws, &cfg) {
-            Some(cmd) => cmd,
-            None => continue,
-        };
-        // Run the command
-        let cmd_res = cmd_con.run_command(&cmd_curr);
-        for outcome in cmd_res.await? {
-            if let Err(error) = outcome {
-                log::debug!("Failed to rename workspace '{}': '{}'", name_curr, error);
-            }
-        }
     }
     Ok(())
 }
