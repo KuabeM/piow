@@ -2,7 +2,7 @@
 name = "piow"
 version = "0.2.1"
 authors = ["Korbinian Maier <korbinian.maier@posteo.de>"]
-edition = "2018"
+edition = "2021"
 description = "Put Icons On your sway Workspaces"
 homepage = "https://github.com/KuabeM/piow.git"
 keywords = ["sway", "wayland", "workspaces"]
