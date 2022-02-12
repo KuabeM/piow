@@ -26,11 +26,12 @@ RUST_LOG=piow=Debug piow
 
 ## Configuration
 
-`piow` looks for a configuration file in toml format in `${XDG_CONFIG_HOME}/piow/config.toml`. If it
-can't find this file, it loads the default configuration contained in this repo. The configuration
-contains a map of application names to icons, a default icon and a separator between workspaces
-number and icons. For getting started, just copy `default.toml` over to
-`${XDG_CONFIG_HOME}/piow/config.toml` and start adding your own icons.
+`piow` looks for a configuration file in toml format in `${XDG_CONFIG_HOME}/piow/config.toml` or
+`/etc/xdg/piow/config.toml` (the former takes precedence over the latter). If it can't find this
+file, it loads the default configuration contained in this repo. The configuration contains a map
+of application names to icons, a default icon and a separator between workspaces number and icons.
+For getting started, just copy `default.toml` over to `${XDG_CONFIG_HOME}/piow/config.toml` and
+start adding your own icons.
 
 | Configuration Key | Description                                                                                                                                            |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|

@@ -22,7 +22,8 @@ Usage:
 Options:
   -h --help            Show this screen.
   --version            Print the version and exit.
-  --config=<cfg>       Path to config file. Defaults to $XDG_CONFIG_HOME or $HOME/.config.
+  --config=<cfg>       Path to config file. Defaults to piow/config.toml under
+                        $XDG_CONFIG_HOME, $HOME/.config, or /etc/xdg.
   --syslog             Send log messages to syslog instead of stdout.
 "#;
 
