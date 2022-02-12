@@ -36,17 +36,25 @@ impl Default for Config {
 
 impl Config {
     /// Load the configuration file from either `path` or the default config dir
-    /// `${XDG_CONFIG_HOME}`.
+    /// `${XDG_CONFIG_HOME}` or `/etc/xdg`.
     ///
     /// Error: File does not exist or can't be opened, syntax errors and other parsing errors.
     pub fn load(path: Option<PathBuf>) -> Result<Self, Error> {
         let cfg_path: PathBuf = if let Some(p) = path {
             p
         } else {
-            dirs::config_dir()
+            let user_path = dirs::config_dir()
                 .ok_or_else(|| format_err!("Can't access default config dir."))?
                 .join(env!("CARGO_PKG_NAME"))
-                .join("config.toml")
+                .join("config.toml");
+            let sys_path =
+                PathBuf::from(format!("/etc/xdg/{}/config.toml", env!("CARGO_PKG_NAME")));
+
+            if !user_path.exists() && sys_path.exists() {
+                sys_path
+            } else {
+                user_path
+            }
         };
         debug!("Loading config file '{}'", &cfg_path.to_string_lossy());
         let mut f = std::fs::File::open(cfg_path)?;
