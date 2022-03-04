@@ -5,7 +5,7 @@ use swayipc_async::Node;
 use crate::config::Config;
 
 fn filter_nodes(node: &Node) -> Vec<String> {
-    let ids = node
+    let mut ids: Vec<String> = node
         .nodes
         .iter()
         .map(|n| {
@@ -22,6 +22,9 @@ fn filter_nodes(node: &Node) -> Vec<String> {
         })
         .flatten()
         .collect();
+    if let Some(app_id) = &node.app_id {
+        ids.push(app_id.clone());
+    }
     ids
 }
 
@@ -39,7 +42,7 @@ impl From<&Node> for AppIds {
         let mut floating = workspace
             .floating_nodes
             .iter()
-            .map(|n| filter_nodes(n))
+            .map(filter_nodes)
             .flatten()
             .collect();
         trace!("Floating app ids {:?}", floating);
