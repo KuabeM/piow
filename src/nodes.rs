@@ -8,7 +8,7 @@ fn filter_nodes(node: &Node) -> Vec<String> {
     let mut ids: Vec<String> = node
         .nodes
         .iter()
-        .map(|n| {
+        .flat_map(|n| {
             let mut ids = filter_nodes(n);
             if let Some(props) = n.window_properties.as_ref() {
                 if let Some(class) = props.class.as_ref() {
@@ -20,7 +20,6 @@ fn filter_nodes(node: &Node) -> Vec<String> {
             }
             ids
         })
-        .flatten()
         .collect();
     if let Some(app_id) = &node.app_id {
         ids.push(app_id.clone());
@@ -42,8 +41,7 @@ impl From<&Node> for AppIds {
         let mut floating = workspace
             .floating_nodes
             .iter()
-            .map(filter_nodes)
-            .flatten()
+            .flat_map(filter_nodes)
             .collect();
         trace!("Floating app ids {:?}", floating);
         ids.append(&mut floating);
