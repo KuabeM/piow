@@ -1,7 +1,7 @@
 //! Configuration handling for piow.
 //!
 //! Parsing the toml file format into a `Config` struct.
-use failure::{format_err, Error};
+use anyhow::{anyhow, Result};
 use indexmap::IndexMap;
 use log::{debug, warn};
 use serde_derive::Deserialize;
@@ -39,7 +39,7 @@ impl Config {
     /// or `/etc/xdg`.
     ///
     /// Error: File does not exist or can't be opened, syntax errors and other parsing errors.
-    pub fn load(path: Option<PathBuf>) -> Result<Self, Error> {
+    pub fn load(path: Option<PathBuf>) -> Result<Self> {
         let cfg_path: PathBuf = if let Some(p) = path {
             p
         } else {
@@ -53,7 +53,7 @@ impl Config {
         let mut f = std::fs::File::open(cfg_path)?;
         let mut content = String::new();
         f.read_to_string(&mut content)?;
-        toml::from_str(&content).map_err(|e| format_err!("Failed to parse config: {}", e))
+        toml::from_str(&content).map_err(|e| anyhow!("Failed to parse config: {}", e))
     }
 
     /// Generate the workspace name from the format string in the config by replacing all

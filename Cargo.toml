@@ -1,6 +1,6 @@
 [package]
 name = "piow"
-version = "0.4.0"
+version = "0.4.1-alpha"
 authors = ["Korbinian Maier <korbinian.maier@posteo.de>"]
 edition = "2018"
 description = "Put Icons On your sway Workspaces"
@@ -25,7 +25,7 @@ toml = "0.5"
 docopt = "1"
 env_logger = "0.9"
 syslog = "6"
-failure = "0.1"
+anyhow = "1"
 log = "0.4"
 
 [profile.release]

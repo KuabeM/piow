@@ -1,6 +1,6 @@
 //! Rename workspaces of your sway window manager by dynamically adding icons of applications in
 //! each workspace. Configuration is done in toml file at `${XDG_CONFIG_HOME}/piow/config.toml`.
-use failure::{format_err, Error};
+use anyhow::{anyhow, Result};
 use futures_util::stream::StreamExt;
 use log::error;
 use serde_derive::Deserialize;
@@ -46,7 +46,7 @@ macro_rules! skip_none {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<()> {
     let args: Args = docopt::Docopt::new(USAGE)
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
@@ -57,7 +57,7 @@ async fn main() -> Result<(), Error> {
             log::LevelFilter::Warn,
             Some(env!("CARGO_PKG_NAME")),
         )
-        .map_err(|e| format_err!("{}", e))?;
+        .map_err(|e| anyhow!("{}", e))?;
     } else {
         env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn"))
             .format_timestamp(None)
