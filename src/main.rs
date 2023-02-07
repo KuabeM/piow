@@ -95,20 +95,36 @@ async fn main() -> Result<()> {
                 // Get new name for current workspace (The one we landed on).
                 let (name_curr, cmd_curr) =
                     skip_none!(nodes::construct_rename_cmd(&ev.current.unwrap(), &cfg));
+
                 // Get new name for old workspace (The one we came from).
                 let (name_old, cmd_old) =
                     skip_none!(nodes::construct_rename_cmd(&ev.old.unwrap(), &cfg));
                 // Run the commands
-                for outcome in cmd_con.run_command(&cmd_curr).await? {
-                    if let Err(error) = outcome {
-                        log::debug!("Failed to rename workspace '{}': '{}'", name_curr, error);
-                    }
-                }
-                for outcome in cmd_con.run_command(&cmd_old).await? {
-                    if let Err(error) = outcome {
-                        log::debug!("Failed to rename workspace '{}': '{}'", name_old, error);
-                    }
-                }
+                cmd_con
+                    .run_command(&cmd_curr)
+                    .await?
+                    .iter()
+                    .filter(|r| r.is_err())
+                    .for_each(|e| {
+                        log::debug!(
+                            "Failed to rename workspace '{}': '{}'",
+                            name_curr,
+                            e.as_ref().unwrap_err()
+                        );
+                    });
+
+                cmd_con
+                    .run_command(&cmd_old)
+                    .await?
+                    .iter()
+                    .filter(|r| r.is_err())
+                    .for_each(|e| {
+                        log::debug!(
+                            "Failed to rename workspace '{}': '{}'",
+                            name_old,
+                            e.as_ref().unwrap_err()
+                        );
+                    });
             }
             _ => unreachable!("Unsubscribed events unreachable."),
         };
