@@ -6,7 +6,7 @@ edition = "2018"
 description = "Put Icons On your sway Workspaces"
 homepage = "https://github.com/KuabeM/piow.git"
 keywords = ["sway", "wayland", "workspaces"]
-license = "MIT OR Apache-2.0"
+license = "MIT"
 readme = "README.md"
 repository = "https://github.com/KuabeM/piow.git"
 
