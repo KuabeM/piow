@@ -10,17 +10,16 @@ fn filter_nodes(node: &Node) -> Vec<String> {
         .iter()
         .flat_map(|n| {
             let mut ids = filter_nodes(n);
-            n.window_properties
+            if let Some(class) = n
+                .window_properties
                 .as_ref()
                 .and_then(|props| props.class.clone())
-                .and_then(|class| {
-                    ids.push(class);
-                    Some(())
-                });
-            n.app_id.as_ref().and_then(|id| {
+            {
+                ids.push(class);
+            };
+            if let Some(id) = n.app_id.as_ref() {
                 ids.push(id.to_string());
-                Some(())
-            });
+            };
             ids
         })
         .collect();

@@ -1,14 +1,14 @@
 [package]
 name = "piow"
-version = "0.4.1-alpha"
+version = "0.4.1"
 authors = ["Korbinian Maier <korbinian.maier@posteo.de>"]
 edition = "2018"
 description = "Put Icons On your sway Workspaces"
-homepage = "https://github.com/KuabeM/piow.git"
+homepage = "https://github.com/KuabeM/piow"
 keywords = ["sway", "wayland", "workspaces"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/KuabeM/piow.git"
+repository = "https://github.com/KuabeM/piow"
 
 [dependencies]
 # Async connection to sway
