@@ -6,6 +6,7 @@ use log::error;
 use serde_derive::Deserialize;
 use std::path::PathBuf;
 use swayipc_async::{Connection, Event, EventType, WorkspaceChange};
+use sysinfo::{ProcessExt, SystemExt};
 
 mod config;
 mod nodes;
@@ -15,7 +16,7 @@ const USAGE: &str = r#"
 Put icons of apps on sway workspaces.
 
 Usage:
-    piow [--config=<cfg>] [--syslog]
+    piow [--config=<cfg>] [--syslog] [--replace]
     piow (-h|--help)
     piow (-v|--version)
 
@@ -25,6 +26,7 @@ Options:
   --config=<cfg>       Path to config file. Defaults to piow/config.toml under
                         $XDG_CONFIG_HOME, $HOME/.config, or /etc/xdg.
   --syslog             Send log messages to syslog instead of stdout.
+  --replace            Replace currently running piow instances.
 "#;
 
 /// Docopt argument struct.
@@ -34,6 +36,7 @@ struct Args {
     flag_syslog: bool,
     flag_version: bool,
     flag_help: bool,
+    flag_replace: bool,
 }
 
 macro_rules! skip_none {
@@ -70,6 +73,20 @@ async fn main() -> Result<()> {
     } else if args.flag_version {
         println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         return Ok(());
+    }
+
+    if args.flag_replace {
+        let mut sys = sysinfo::System::new();
+        sys.refresh_processes();
+        let own_pid = sysinfo::get_current_pid().map_err(|e| anyhow!(e))?;
+        for proc in sys
+            .processes_by_name(env!("CARGO_PKG_NAME"))
+            .filter(|proc| proc.pid() != own_pid)
+        {
+            log::info!("Replacing piow instance {}", proc.pid());
+            proc.kill_with(sysinfo::Signal::Quit)
+                .ok_or(anyhow!("Failed to kill {}", proc.name()))?;
+        }
     }
 
     // Load config: app_id to icon mapping

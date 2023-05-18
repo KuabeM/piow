@@ -27,6 +27,7 @@ env_logger = "0.9"
 syslog = "6"
 anyhow = "1"
 log = "0.4"
+sysinfo = "0.29.0"
 
 [profile.release]
 lto = true
